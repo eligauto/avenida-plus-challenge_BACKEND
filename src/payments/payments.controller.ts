@@ -2,11 +2,12 @@ import { Controller, Get, Post, Body, Param } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 import { Payment } from './payment.interface';
 
+
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
-  @Post()
+  @Post('/create')
   createPayment(@Body() payment: Payment) {
     return this.paymentsService.createPayment(payment);
   }
