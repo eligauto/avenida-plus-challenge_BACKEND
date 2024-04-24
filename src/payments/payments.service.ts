@@ -13,48 +13,37 @@ export class PaymentsService {
       // 1st Step: Token Creation
       const tokenResponse = await this.payWayApiService.createToken(
         paymentData,
-      ); //
-      if (tokenResponse.status === 'active') {
-        let payment = {
-          ...paymentData,
-          id: this.generateId(),
-        };
-
-        //Payment execution
-        const paymentResponse = await this.payWayApiService.executePayment({
-          site_transaction_id: 'Bolishopping' + payment.id,
-          token: tokenResponse.id,
-          payment_method_id: 1,
-          bin: paymentData.card_number.substring(0, 6),
-          amount: paymentData.amount,
-          currency: 'BRL',
-          installments: 1,
-          payment_type: 'credit',
-          sub_payments: [],
-        });
-
-        if (paymentResponse.status === 'approved') {
-          payment = {
-            ...payment,
-            status: paymentResponse.status,
-            date: paymentResponse.date,
-          };
-        } else {
-          throw new HttpException(
-            'Payment not approved',
-            HttpStatus.BAD_REQUEST,
-          );
-        }
-        this.payments.push(payment);
-        return payment;
-      } else {
-        throw new HttpException('Payment not approved', HttpStatus.BAD_REQUEST);
-      }
-    } catch (error) {
-      throw new HttpException(
-        'Error with payment processing',
-        HttpStatus.INTERNAL_SERVER_ERROR,
       );
+
+      let payment = {
+        ...paymentData,
+        id: this.generateId(),
+      };
+
+      //Payment execution
+      const paymentResponse = await this.payWayApiService.executePayment({
+        site_transaction_id: this.uuidGenerator(),
+        token: tokenResponse.id,
+        payment_method_id: 1,
+        bin: paymentData.card_number.substring(0, 6),
+        amount: paymentData.amount,
+        currency: 'ARS',
+        installments: 1,
+        payment_type: 'single',
+        sub_payments: [],
+      });
+
+      payment = {
+        ...payment,
+        status: paymentResponse.status,
+        date: paymentResponse.date,
+        transaction_id: paymentResponse.site_transaction_id,
+      };
+
+      this.payments.push(payment);
+      return payment;
+    } catch (error) {
+      return error;
     }
   }
 
@@ -71,5 +60,9 @@ export class PaymentsService {
   // This method generates a unique ID for a new payment.
   private generateId(): number {
     return this.payments.length + 1;
+  }
+
+  private uuidGenerator(): string {
+    return Math.random().toString(36).substring(2) + Date.now().toString(36);
   }
 }

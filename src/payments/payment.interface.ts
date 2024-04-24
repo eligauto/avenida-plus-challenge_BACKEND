@@ -6,4 +6,5 @@ export interface Payment extends TokenRequest{
   amount?: number;
   status?: string;
   date?: string;
+  transaction_id?: string;
 }
