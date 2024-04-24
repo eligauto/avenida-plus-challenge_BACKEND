@@ -1,5 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PayWayApiService } from 'src/pay-way-api/pay-way-api.service';
+import { Injectable } from '@nestjs/common';
+import { PayWayApiService } from '../pay-way-api/pay-way-api.service';
 import { Payment } from './payment.interface';
 
 @Injectable()
@@ -48,13 +48,13 @@ export class PaymentsService {
   }
 
   // This method creates a new payment and adds it to the database.
-  getPaymentById(id: string): Payment | undefined {
-    return this.payments.find((payment) => payment.id === Number(id));
+  async getPaymentById(id: string): Promise<Payment | undefined> {
+    return await this.payments.find((payment) => payment.id === Number(id));
   }
 
   // This method returns all payments in the database.
-  getAllPayments(): Payment[] {
-    return this.payments;
+  async getAllPayments(): Promise<Payment[]> {
+    return await this.payments;
   }
 
   // This method generates a unique ID for a new payment.
