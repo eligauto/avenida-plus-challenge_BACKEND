@@ -7,7 +7,8 @@ export class PaymentsService {
   constructor(private payWayApiService: PayWayApiService) {}
   // This is a simple in-memory database of payments.
   private readonly payments: Payment[] = [];
-
+  
+  // This method creates a new payment and adds it to the database.
   async createPayment(paymentData: Payment) {
     try {
       // 1st Step: Token Creation
@@ -47,8 +48,11 @@ export class PaymentsService {
     }
   }
 
-  // This method creates a new payment and adds it to the database.
-  async getPaymentById(id: string): Promise<Payment | undefined> {
+  // In the Challenge says that this method should return a payment by its ID, but if the ID is not provided, it should return all payments.
+  async getPaymentById(id?: string): Promise<Payment | Payment[] | undefined> {
+    if (!id) {
+      return await this.getAllPayments();
+    }
     return await this.payments.find((payment) => payment.id === Number(id));
   }
 
